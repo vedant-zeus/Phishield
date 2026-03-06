@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h1>PhishGuard AI</h1>
+    </div>
+
+    <div id="status-card" class="status-card animate-in">
+      <div class="status-label">Security Analysis</div>
+      <div class="score-container">
+        <div id="score-circle" class="score-circle" style="--progress: 0%;">
+          <div id="score-value" class="score-value">--</div>
+        </div>
+      </div>
+      <div id="status-title" class="status-title">Initialzing...</div>
+      <div id="url-box" class="url-box">Detecting URL...</div>
+    </div>
+
+    <div class="features-grid animate-in" style="animation-delay: 0.1s;">
+      <div class="feature-item">
+        <span class="feature-label">Protection</span>
+        <span id="prot-val" class="feature-val" style="color: var(--success)">Active</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-label">Model</span>
+        <span class="feature-val">Rust v1.2</span>
+      </div>
+    </div>
+
+    <div id="phishing-details" class="features-grid animate-in" style="animation-delay: 0.2s; display: none;">
+        <div class="feature-item">
+            <span class="feature-label">Suspicious Keys</span>
+            <span id="feat-keywords" class="feature-val">0</span>
+        </div>
+        <div class="feature-item">
+            <span class="feature-label">Digit Count</span>
+            <span id="feat-digits" class="feature-val">0</span>
+        </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

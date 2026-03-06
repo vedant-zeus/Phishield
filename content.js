@@ -1,5 +1,39 @@
 // PhishGuard AI - Content Script
 
+// DOM Feature Extraction (Phase 6)
+function extractDomFeatures() {
+  const features = {
+    hasPassword: document.querySelectorAll('input[type="password"]').length > 0 ? 1 : 0,
+    formCount: document.forms.length,
+    linkMismatch: 0,
+    hiddenFields: document.querySelectorAll('input[type="hidden"]').length
+  };
+
+  // Detect link-text mismatch (e.g. Text: google.com, Href: fake.com)
+  const links = document.querySelectorAll('a');
+  links.forEach(link => {
+    const text = link.innerText.toLowerCase();
+    const href = link.href.toLowerCase();
+    const domainPattern = /[a-z0-9-]+\.[a-z]{2,}/i;
+
+    if (domainPattern.test(text) && !href.includes(text.match(domainPattern)[0])) {
+      features.linkMismatch++;
+    }
+  });
+
+  return features;
+}
+
+// Notify background about DOM features on load
+window.addEventListener('load', () => {
+  const domTraits = extractDomFeatures();
+  chrome.runtime.sendMessage({
+    type: "DOM_REPORT",
+    payload: domTraits,
+    url: window.location.href
+  });
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "PHISHING_DETECTED") {
     showWarningOverlay(message.score);

@@ -21,34 +21,27 @@ fn extract_features(url_str: &str) -> Vec<f64> {
     let mut features = Vec::new();
     let url = match Url::parse(url_str) {
         Ok(u) => u,
-        Err(_) => return vec![0.0; 12], // Updated to 12 features
+        Err(_) => return vec![0.0; 17], // Updated to 17 features
     };
 
-    // 1. URL Length
+    let host = url.host_str().unwrap_or("").to_lowercase();
+
+    // 1-8. Structural features
     features.push(url_str.len() as f64);
-    // 2. Dot count
     features.push(url_str.matches('.').count() as f64);
-    // 3. Hyphen count
     features.push(url_str.matches('-').count() as f64);
-    // 4. At count
     features.push(url_str.matches('@').count() as f64);
-    // 5. Slash count
     features.push(url_str.matches('/').count() as f64);
-    // 6. Question mark count
     features.push(url_str.matches('?').count() as f64);
-    // 7. Equal count
     features.push(url_str.matches('=').count() as f64);
-    // 8. Digit count
     features.push(url_str.chars().filter(|c| c.is_digit(10)).count() as f64);
     
     // 9. Has IP
-    let host = url.host_str().unwrap_or("");
     let has_ip = if host.chars().all(|c| c.is_digit(10) || c == '.') && host.contains('.') { 1.0 } else { 0.0 };
     features.push(has_ip);
 
     // 10. Subdomain count
-    let subdomain_count = host.split('.').count() as f64;
-    features.push(subdomain_count);
+    features.push(host.split('.').count() as f64);
 
     // 11. Special keywords
     let keywords = ["login", "verify", "update", "account", "bank", "secure", "signin", "password"];
@@ -61,36 +54,49 @@ fn extract_features(url_str: &str) -> Vec<f64> {
     }
     features.push(keyword_count);
 
-    // 12. Shortened URL check (new feature)
+    // 12. Shortened URL check
     let shorteners = ["bit.ly", "goo.gl", "tinyurl.com", "t.co"];
     let is_shortened = if shorteners.iter().any(|&s| host.contains(s)) { 1.0 } else { 0.0 };
     features.push(is_shortened);
+
+    // --- Phase 5: Trust Signals ---
+    // 13. SSL Check
+    let is_https = if url.scheme() == "https" { 1.0 } else { 0.0 };
+    features.push(is_https);
+
+    // 14. Whitelist Check
+    let whitelist = ["google.com", "amazon.com", "facebook.com", "apple.com", "microsoft.com"];
+    let is_whitelisted = if whitelist.iter().any(|&d| host.contains(d)) { 1.0 } else { 0.0 };
+    features.push(is_whitelisted);
+
+    // --- Phase 6: DOM Traits (Mocked for trainer) ---
+    // 15. hasPassword
+    let has_pass = if url_str.contains("login") || url_str.contains("signin") { 1.0 } else { 0.0 };
+    features.push(has_pass);
+    // 16. linkMismatch
+    features.push(0.0);
+    // 17. formCount
+    features.push(if has_pass > 0.5 { 1.0 } else { 0.0 });
 
     features
 }
 
 fn download_datasets() -> (Vec<Vec<f64>>, Vec<usize>) {
-    println!("[PHISHGUARD] Starting premium dataset ingestion...");
-    // Extended sample list for better training
+    println!("[PHISHGUARD] Retraining with DOM Deep Analysis...");
+    
     let phish_urls = vec![
         "http://verification-paypal.com/login",
         "http://secure-update-bank.top/account",
         "http://192.168.1.1/login.php",
         "http://bit.ly/random-hack",
-        "http://account-verify-service.info/up",
-        "http://signin.microsft-online.com/auth",
-        "http://bankofamerica-secure.net/verify",
-        "http://update-your-password-now.sh/login"
+        "http://signin.microsft-online.com/auth"
     ];
 
     let legit_urls = vec![
         "https://google.com",
-        "https://github.com",
-        "https://microsoft.com",
-        "https://rust-lang.org",
-        "https://wikipedia.org",
         "https://amazon.com",
-        "https://netflix.com",
+        "https://github.com",
+        "https://wikipedia.org",
         "https://apple.com"
     ];
 
@@ -129,13 +135,12 @@ fn main() {
 
     let dataset = Dataset::new(x, y);
     
-    println!("[PHISHGUARD] Training Neural-style Logistic Engine...");
+    println!("[PHISHGUARD] Optimizing weights for Deep Analysis...");
     let model = LogisticRegression::default()
         .max_iterations(200)
         .fit(&dataset)
         .expect("Model training failed");
 
-    println!("[PHISHGUARD] Synchronizing weights for Extension...");
     let metadata = ModelMetadata {
         coefficients: model.params().clone().into_raw_vec(),
         intercept: 0.0,
@@ -143,7 +148,9 @@ fn main() {
             "length".to_string(), "dots".to_string(), "hyphens".to_string(), 
             "at".to_string(), "slashes".to_string(), "questions".to_string(), 
             "equals".to_string(), "digits".to_string(), "has_ip".to_string(), 
-            "subdomains".to_string(), "keywords".to_string(), "shortened".to_string()
+            "subdomains".to_string(), "keywords".to_string(), "shortened".to_string(),
+            "https".to_string(), "whitelisted".to_string(),
+            "has_password".to_string(), "link_mismatch".to_string(), "form_count".to_string()
         ],
     };
 
@@ -151,5 +158,5 @@ fn main() {
     let mut file = File::create("model.json").expect("Failed to create model.json");
     file.write_all(json.as_bytes()).unwrap();
     
-    println!("[PHISHGUARD] Success! Premium model.json generated.");
+    println!("[PHISHGUARD] Success! Hybrid model.json exported.");
 }

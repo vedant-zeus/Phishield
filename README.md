@@ -23,19 +23,20 @@ The [Rust Trainer](file:///d:/New_Minor/src/main.rs) extracts 12 structural and 
 - **Local Inference**: All calculations happen in your browser—no data ever leaves your device.
 - **Reactive UI**: Injects a high-fidelity warning [overlay](file:///d:/New_Minor/content.js) on detected threats.
 
-## 🚀 Getting Started
+## 🚀 Quick Start (No Setup Required)
 
-### 1. Model Preparation
-If you wish to refresh the intelligence:
-```bash
-cargo run
-```
-This updates the `model.json` core weights.
+PhishGuard AI is **100% Local**. It does not require any backend services or internet APIs to protect you.
 
-### 2. Extension Installation
-1. Visit `chrome://extensions/`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked** and select the root folder of this project.
+1. Open Chrome and visit `chrome://extensions/`.
+2. Enable **Developer mode** (top right).
+3. Click **Load unpacked** and select this project folder (`d:\New_Minor`).
+4. **That's it!** The AI is now active and will scan every page you visit locally.
 
-## 🎨 Visual Preview
-The extension features a stunning dark-mode interface with vibrant neon accents, ensuring that security is as beautiful as it is robust.
+## 🏗️ Technical Architecture
+### Local Inference Engine
+- **Self-Contained**: All feature extraction and security logic resides within the extension.
+- **Privacy-First**: No data is sent to external servers. Your browsing history stays on your machine.
+- **Pre-trained Intelligence**: Uses a highly optimized 12-feature model weights file (`model.json`).
+
+### Backend (Optional Developer Tool)
+The included Rust code in `/src` is only for developers who wish to *retrain* the model from scratch. It is **not required** for the extension to function.
